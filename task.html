@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyPlan|Task Management</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-purple: #8B5CF6;
+            --primary-pink: #EC4899;
+            --sidebar-bg: #ffffff;
+            --main-bg: #f8fafc;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --todo-bg: #edd1f0;
+            --progress-bg: #dbeafe;
+            --completed-bg: #d1fae5;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f0f9f0 0%, #fdf2f8 100%);
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: var(--sidebar-bg);
+            box-shadow: var(--card-shadow);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-brand {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .brand-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+            flex: 1;
+        }
+
+        .nav-item {
+            margin: 0.25rem 1rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background-color: #f1f5f9;
+            color: #334155;
+        }
+
+        .nav-link.active {
+            background-color: #ede9fe;
+            color: var(--primary-purple);
+        }
+
+        .nav-link i {
+            width: 20px;
+            margin-right: 12px;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-header {
+            background: white;
+            box-shadow: var(--card-shadow);
+            padding: 1.5rem 2rem;
+        }
+
+        .greeting-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .greeting-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 1rem;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 320px;
+        }
+
+        .search-box input {
+            padding-left: 2.5rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 0.75rem 1rem;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .content-section {
+            padding: 2rem;
+            flex: 1;
+        }
+
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            min-height: 600px;
+        }
+
+        .kanban-column {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            min-height: 500px;
+        }
+
+        .column-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f1f5f9;
+            margin-bottom: 1.5rem;
+        }
+
+        .column-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #1e293b;
+            flex: 1;
+        }
+
+        .column-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .add-task-btn, .menu-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 6px;
+            background: #f1f5f9;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .add-task-btn:hover, .menu-btn:hover {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .task-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #e2e8f0;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .todo-column {
+            background: var(--todo-bg);
+        }
+
+        .todo-column .task-card {
+            border-left-color: #8f46a5;
+            background: linear-gradient(135deg, #ffffff, #f8faff);
+        }
+
+        .progress-column {
+            background: var(--progress-bg);
+        }
+
+        .progress-column .task-card {
+            border-left-color: #3b82f6;
+            background: linear-gradient(135deg, #ffffff, #f0f9ff);
+        }
+
+        .completed-column {
+            background: var(--completed-bg);
+        }
+
+        .completed-column .task-card {
+            border-left-color: #10b981;
+            background: linear-gradient(135deg, #ffffff, #f0fdf4);
+        }
+
+        .task-title {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .task-description {
+            color: #64748b;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .task-progress {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .progress-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            flex: 1;
+        }
+
+        .progress-percentage {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.875rem;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 0.75rem;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-purple), var(--primary-pink));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .task-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .edit-task-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: rgba(100, 116, 139, 0.1);
+            border-radius: 4px;
+            color: #64748b;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        .task-card:hover .edit-task-btn {
+            opacity: 1;
+        }
+
+        .edit-task-btn:hover {
+            background: rgba(100, 116, 139, 0.2);
+        }
+
+        .completed-task {
+            opacity: 0.8;
+        }
+
+        .completed-task .task-title {
+            text-decoration: line-through;
+        }
+
+          .footer {
+            background: white;
+            padding: 20px 30px;
+            border-top: 1px solid #e9ecef;
+            text-align: center;
+            color: #6c757d;
+            font-size: 14px;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-toggle {
+                display: block !important;
+            }
+
+            .kanban-board {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .content-section {
+                padding: 1rem;
+            }
+        }
+
+        .mobile-toggle {
+            display: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="d-flex align-items-center">
+                <div class="brand-logo">SP</div>
+                <span class="fw-bold ms-2 text-dark">StudyPlan</span>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-chart-bar"></i>
+                    Dashboard
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="class.html" class="nav-link">
+                    <i class="fas fa-users"></i>
+                    My Class
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="task.html" class="nav-link active">
+                    <i class="fas fa-tasks"></i>
+                    Task                
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="calendar.html" class="nav-link">
+                    <i class="fas fa-calendar"></i>
+                    Calendar
+                </a>
+            </div>
+             <div class="nav-item">
+                <a href="profile.html" class="nav-link">
+                    <i class="fas fa-user-friends"></i>
+                    Profile
+                </a>
+            </div>
+
+        </nav>
+        
+        <div class="sidebar-nav border-top pt-3">
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-file-alt"></i>
+                    Report
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-question-circle"></i>
+                    Help
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="index.html" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Log out
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="top-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="greeting-section">
+                    <div class="greeting-avatar"><i class="fas fa-tasks"></i></div>
+                    <div>
+                        <h4 class="mb-0 fw-semibold"> .˚꩜ Task Management  .˚꩜ </h4>
+                        <p class="mb-0 text-muted">Your Success Plan, One Step at a Time</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex align-items-center gap-3">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" placeholder="Search tasks...">
+                    </div>
+                    <button class="btn btn-light rounded-circle p-2">
+                        <i class="fas fa-bell text-muted"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <div class="content-section">
+            <div class="kanban-board">
+                <!-- Todo Column -->
+                <div class="kanban-column todo-column">
+                    <div class="column-header">
+                        <div class="column-title">To do List:</div>
+                        <div class="column-actions">
+                            <button class="add-task-btn" onclick="addNewTask('todo')">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button class="menu-btn">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="task-card fade-in">
+                        <button class="edit-task-btn">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <div class="task-title">Assignment:</div>
+                        <div class="task-description">Note: IMS565 Group Assignment Report</div>
+                         <div class="task-progress">
+                            <div class="progress-label">Progress</div>
+                            <div class="progress-percentage">30%</div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: 30%"></div>
+                        </div>
+                        <div class="task-meta">
+                            <span>Submission Week 14</span>
+                        </div>
+                    </div>
+
+                    <div class="task-card fade-in">
+                        <button class="edit-task-btn">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <div class="task-title">Assignment:</div>
+                        <div class="task-description">Note: IMS564 Figma</div>
+                        <div class="task-progress">
+                            <div class="progress-label">Progress</div>
+                            <div class="progress-percentage">50%</div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: 50%"></div>
+                        </div>
+                        <div class="task-meta">
+                            <span>Submission Week 14</span>
+                        </div>
+                    </div>
+
+                    <div class="task-card fade-in">
+                        <button class="edit-task-btn">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <div class="task-title">Assignment:</div>
+                        <div class="task-description">Note: IMS566 Group Assignment</div>
+                        <div class="task-progress">
+                            <div class="progress-label">Progress</div>
+                            <div class="progress-percentage">50%</div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: 50%"></div>
+                        </div>
+                        <div class="task-meta">
+                            <span>Submission Week 14</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- In Progress Column -->
+                <div class="kanban-column progress-column">
+                    <div class="column-header">
+                        <div class="column-title">Test/Exam:</div>
+                        <div class="column-actions">
+                            <button class="add-task-btn" onclick="addNewTask('progress')">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button class="menu-btn">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="task-card fade-in">
+                        <button class="edit-task-btn">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <div class="task-title">IMR533</div>
+                        <div class="task-description">Final Test (3 July 2025)</div>
+                    </div>
+
+                    <div class="task-card fade-in">
+                        <button class="edit-task-btn">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <div class="task-title">IMS564</div>
+                        <div class="task-description">Final Test Week 14</div>
+                    </div>
+
+                    <div class="task-card fade-in">
+                        <button class="edit-task-btn">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <div class="task-title">TAC501</div>
+                        <div class="task-description">Written Test Week 13</div>
+                    </div>
+
+                    <div class="task-card fade-in">
+                        <button class="edit-task-btn">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <div class="task-title">IMS565</div>
+                        <div class="task-description">Final Test Week 13</div>
+                    </div>
+
+                    <div class="task-card fade-in">
+                        <button class="edit-task-btn">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <div class="task-title">IMS560</div>
+                        <div class="task-description">Final Test Week 13</div>
+                    </div>
+                </div>
+
+                <!-- Completed Column -->
+                <div class="kanban-column completed-column">
+                    <div class="column-header">
+                        <div class="column-title">Completed:</div>
+                        <div class="column-actions">
+                            <button class="add-task-btn" onclick="addNewTask('completed')">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button class="menu-btn">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="task-card fade-in completed-task">
+                        <button class="edit-task-btn">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <div class="task-title">IMS565</div>
+                        <div class="task-description">
+                            Individual Assignment<br>
+                        </div>
+                    </div>
+
+                    <div class="task-card fade-in completed-task">
+                        <button class="edit-task-btn">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <div class="task-title">IMS564</div>
+                        <div class="task-description">
+                            Individual Assignment<br>
+                        </div>
+                    </div>
+
+                    <div class="task-card fade-in completed-task">
+                        <button class="edit-task-btn">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <div class="task-title">IMR533</div>
+                        <div class="task-description">
+                            Individual Assignment<br>
+                        </div>
+                    </div>
+            </div>
+        </div>
+
+  <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2025 StudyPlan Task. All rights reserved. | Built with Love</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+ 
+        // Sidebar functionality
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            lessonDetails.classList.remove('active');
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.remove('show');
+            }
+        });
+
+        // Mobile Sidebar Toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('show');
+        }
+
+        // Task Management Functions
+        function addNewTask(column) {
+            const taskTitle = prompt('Enter task title:');
+            if (taskTitle) {
+                const taskCard = createTaskCard(taskTitle, '', 0);
+                const columnElement = document.querySelector(`.${column}-column`);
+                columnElement.appendChild(taskCard);
+                
+                // Add animation
+                taskCard.style.opacity = '0';
+                taskCard.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    taskCard.style.transition = 'all 0.3s ease';
+                    taskCard.style.opacity = '1';
+                    taskCard.style.transform = 'translateY(0)';
+                }, 100);
+            }
+        }
+
+        function createTaskCard(title, description, progress) {
+            const card = document.createElement('div');
+            card.className = 'task-card fade-in';
+            
+            const progressBar = progress > 0 ? `
+                <div class="task-progress">
+                    <div class="progress-label">Progress</div>
+                    <div class="progress-percentage">${progress}%</div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: ${progress}%"></div>
+                </div>
+            ` : '';
+            
+            card.innerHTML = `
+                <button class="edit-task-btn" onclick="editTask(this)">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <div class="task-title">${title}</div>
+                ${description ? `<div class="task-description">${description}</div>` : ''}
+                ${progressBar}
+            `;
+            
+            return card;
+        }
+
+        function editTask(button) {
+            const taskCard = button.parentElement;
+            const titleElement = taskCard.querySelector('.task-title');
+            const currentTitle = titleElement.textContent;
+            
+            const newTitle = prompt('Edit task title:', currentTitle);
+            if (newTitle && newTitle !== currentTitle) {
+                titleElement.textContent = newTitle;
+            }
+        }
+
+        // Drag and Drop Functionality
+        let draggedElement = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const taskCards = document.querySelectorAll('.task-card');
+            const columns = document.querySelectorAll('.kanban-column');
+
+            // Make task cards draggable
+            taskCards.forEach(card => {
+                card.draggable = true;
+                
+                card.addEventListener('dragstart', function(e) {
+                    draggedElement = this;
+                    this.style.opacity = '0.5';
+                });
+                
+                card.addEventListener('dragend', function(e) {
+                    this.style.opacity = '1';
+                    draggedElement = null;
+                });
+            });
+
+            // Make columns droppable
+            columns.forEach(column => {
+                column.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.style.background = '#f0f9ff';
+                });
+                
+                column.addEventListener('dragleave', function(e) {
+                    this.style.background = '';
+                });
+                
+                column.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.style.background = '';
+                    
+                    if (draggedElement && draggedElement !== this) {
+                        this.appendChild(draggedElement);
+                        
+                        // Update task styling based on new column
+                        updateTaskStyling(draggedElement, this);
+                    }
+                });
+            });
+        });
+
+        function updateTaskStyling(taskCard, column) {
+            // Remove completed styling
+            taskCard.classList.remove('completed-task');
+            
+            // Add completed styling if moved to completed column
+            if (column.classList.contains('completed-column')) {
+                taskCard.classList.add('completed-task');
+            }
+        }
+
+        // Search Functionality
+        document.querySelector('.search-box input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const taskCards = document.querySelectorAll('.task-card');
+            
+            taskCards.forEach(card => {
+                const title = card.querySelector('.task-title').textContent.toLowerCase();
+                const description = card.querySelector('.task-description');
+                const descText = description ? description.textContent.toLowerCase() : '';
+                
+                if (title.includes(searchTerm) || descText.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = searchTerm ? 'none' : 'block';
+                }
+            });
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.querySelector('.mobile-toggle');
+            
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+                    sidebar.classList.remove('show');
+                }
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.remove('show');
+            }
+        });
+
+        // Initialize page with animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate task cards on load
+            const taskCards = document.querySelectorAll('.task-card');
+            taskCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

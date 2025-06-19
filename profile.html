@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyPlan|Profile </title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-purple: #8B5CF6;
+            --primary-pink: #EC4899;
+            --sidebar-bg: #ffffff;
+            --main-bg: #f8fafc;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --todo-bg: #e0e7ff;
+            --progress-bg: #dbeafe;
+            --completed-bg: #d1fae5;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f0f9f0 0%, #fdf2f8 100%);
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: var(--sidebar-bg);
+            box-shadow: var(--card-shadow);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-brand {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .brand-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+            flex: 1;
+        }
+
+        .nav-item {
+            margin: 0.25rem 1rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background-color: #f1f5f9;
+            color: #334155;
+        }
+
+        .nav-link.active {
+            background-color: #ede9fe;
+            color: var(--primary-purple);
+        }
+
+        .nav-link i {
+            width: 20px;
+            margin-right: 12px;
+        }
+
+        /* Main content */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .top-header {
+            background: white;
+            box-shadow: var(--card-shadow);
+            padding: 1.5rem 2rem;
+        }
+
+        
+        .greeting-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .greeting-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 1rem;
+        }
+
+        /* Profile Content */
+        .profile-content {
+            flex: 1;
+            padding: 50px;
+        }
+
+        /* Profile Header Card */
+        .profile-header {
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+       .profile-banner {
+           width: 100%;
+           height: 180px; /* Adjust height */
+           overflow: hidden;
+           border-top-left-radius: 20px;
+           border-top-right-radius: 20px;
+        }
+
+      .header-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+
+        .profile-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            
+        }
+        .profile-avatar {
+            width: 200px;
+            height: 200px;
+            border-radius: 90%;
+            padding: 4px;
+            background: conic-gradient(from 180deg at 50% 50%, #ff9a9e, #fad0c4, #fad0c4, #ff9a9e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+}
+       .avatar-img {
+           width: 100%;
+           height: 100%;
+           border-radius: 50%;
+           object-fit: cover;
+        }
+        .profile-info {
+            padding: 70px 40px 40px;
+        }
+
+        .profile-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .profile-role {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .profile-join {
+            color: #95a5a6;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.2s ease;
+        }
+
+        .social-link:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .social-link.facebook { background: #3b5998; }
+        .social-link.instagram { background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); }
+        .social-link.twitter { background: #1da1f2; }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+
+        .stat-icon.followers { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .stat-icon.wins { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .stat-icon.posts { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .stat-icon.runner-up { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+        .stat-icon.challenges { background: linear-gradient(135deg, #fa709a, #fee140); }
+        .stat-icon.following { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+
+        .stat-info h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        .stat-info p {
+            margin: 0;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        /* Content Cards */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 60px;
+            padding: 60px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .content-card h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        /* Skills */
+        .skill-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .skill-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+        }
+
+        .skill-icon.figma { background: linear-gradient(135deg, #f24e1e, #ff7262); }
+        .skill-icon.photoshop { background: linear-gradient(135deg, #31a8ff, #0078d4); }
+        .skill-icon.illustrator { background: linear-gradient(135deg, #ff9a00, #ffb800); }
+        .skill-icon.after-effects { background: linear-gradient(135deg, #9999ff, #0000ff); }
+
+        .skill-info {
+            flex: 1;
+        }
+
+        .skill-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .skill-progress {
+            height: 6px;
+            background: #ecf0f1;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .skill-progress-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s ease;
+        }
+
+        .skill-progress-bar.figma { background: linear-gradient(90deg, #f24e1e, #ff7262); width: 90%; }
+        .skill-progress-bar.photoshop { background: linear-gradient(90deg, #31a8ff, #0078d4); width: 75%; }
+        .skill-progress-bar.illustrator { background: linear-gradient(90deg, #ff9a00, #ffb800); width: 85%; }
+        .skill-progress-bar.after-effects { background: linear-gradient(90deg, #9999ff, #0000ff); width: 60%; }
+
+        /* Activity Chart */
+        .activity-chart {
+            position: relative;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+        }
+
+        .chart-days {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .chart-days .number {
+            font-size: 36px;
+            font-weight: 700;
+            color: #2c3e50;
+            line-height: 1;
+        }
+
+        .chart-days .label {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .activity-legend {
+            margin-top: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .legend-color.games { background: #ff6b35; }
+        .legend-color.karate { background: #f7931e; }
+        .legend-color.badminton { background: #4facfe; }
+
+        /* Footer */
+        .footer {
+            background: white;
+            padding: 20px 30px;
+            border-top: 1px solid #e9ecef;
+            text-align: center;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+  <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="d-flex align-items-center">
+                <div class="brand-logo">SP</div>
+                <span class="fw-bold ms-2 text-dark">StudyPlan</span>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-chart-bar"></i>
+                    Dashboard
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="class.html" class="nav-link">
+                    <i class="fas fa-users"></i>
+                    My Class
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="task.html" class="nav-link">
+                    <i class="fas fa-tasks"></i>
+                    Task                
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="calendar.html" class="nav-link">
+                    <i class="fas fa-calendar"></i>
+                    Calendar
+                </a>
+            </div>
+             <div class="nav-item">
+                <a href="profile.html" class="nav-link active">
+                    <i class="fas fa-user-friends"></i>
+                    Profile
+                </a>
+            </div>
+
+        </nav>
+        
+        <div class="sidebar-nav border-top pt-3">
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-file-alt"></i>
+                    Report
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-question-circle"></i>
+                    Help
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="index.html" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Log out
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+ <header class="top-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="greeting-section">
+                    <div class="greeting-avatar"><i class="fas fa-user-friends"></i></div>
+                    <div>
+                        <h4 class="mb-0 fw-semibold"> ⊹₊ ˚‧︵‿₊୨Profile୧₊‿︵‧ ˚ ₊⊹ </h4>
+                        <p class="mb-0 text-muted">You vs. Yesterday – Let’s Go!</p>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                       <button class="btn btn-light rounded-circle p-2">
+                        <i class="fas fa-bell text-muted"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Profile Content -->
+        <div class="profile-content">
+            <!-- Profile Header -->
+            <div class="profile-header">
+              <div class="profile-banner">
+  <img src="header.jpeg" alt="Profile Header Image" class="header-img">
+</div>
+
+                <div class="profile-avatar">
+                    <img src="profile.jpeg" alt="Profile Picture" class="profile avatar-img">
+                </div>
+                <div class="profile-info d-flex justify-content-between align-items-start">
+                    <div>
+                        <h2 class="profile-name">Nur Aisya Amera binti Salehudin</h2>
+                        <p class="profile-role">CDIM2624ST1</p>
+                        <p class="profile-join">June 2025</p>
+                    </div>
+                    <div class="social-links">
+                        <a href="#" class="social-link facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-link instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link twitter"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon followers">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>7</h3>
+                        <p>Classes</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon wins">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>10</h3>
+                        <p>Complete Task</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon posts">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>20</h3>
+                        <p>All Assignment/Task</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon runner-up">
+                        <i class="fas fa-medal"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>5</h3>
+                        <p>Upcoming</p>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="content-grid">
+                <!-- Skills Section -->
+                <div class="content-card">
+                    <h4>My Current Skill</h4>
+                    <div class="skill-item">
+                        <div class="skill-icon figma">
+                            <i class="fab fa-figma"></i>
+                        </div>
+                        <div class="skill-info">
+                            <div class="skill-name">Figma</div>
+                            <div class="skill-progress">
+                                <div class="skill-progress-bar figma"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">
+                        <div class="skill-icon photoshop">
+                            <i class="fab fa-adobe"></i>
+                        </div>
+                        <div class="skill-info">
+                            <div class="skill-name">Photoshop</div>
+                            <div class="skill-progress">
+                                <div class="skill-progress-bar photoshop"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">
+                        <div class="skill-icon illustrator">
+                            <i class="fas fa-paint-brush"></i>
+                        </div>
+                        <div class="skill-info">
+                            <div class="skill-name">Illustrator</div>
+                            <div class="skill-progress">
+                                <div class="skill-progress-bar illustrator"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">
+                        <div class="skill-icon after-effects">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <div class="skill-info">
+                            <div class="skill-name">After Effects</div>
+                            <div class="skill-progress">
+                                <div class="skill-progress-bar after-effects"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Chart -->
+                <div class="content-card">
+                    <h4>Progress</h4>
+                    <div class="activity-chart">
+                        <div class="chart-container">
+                            <!-- Simplified chart representation -->
+                            <svg width="150" height="150" viewBox="0 0 150 150">
+                                <circle cx="75" cy="75" r="60" fill="none" stroke="#f1f1f1" stroke-width="12"/>
+                                <circle cx="75" cy="75" r="60" fill="none" stroke="#ff6b35" stroke-width="12" 
+                                        stroke-dasharray="150 377" stroke-dashoffset="0" transform="rotate(-90 75 75)"/>
+                                <circle cx="75" cy="75" r="60" fill="none" stroke="#f7931e" stroke-width="12" 
+                                        stroke-dasharray="100 377" stroke-dashoffset="-150" transform="rotate(-90 75 75)"/>
+                                <circle cx="75" cy="75" r="60" fill="none" stroke="#4facfe" stroke-width="12" 
+                                        stroke-dasharray="127 377" stroke-dashoffset="-250" transform="rotate(-90 75 75)"/>
+                            </svg>
+                            <div class="chart-days">
+                                <div class="number"><h6>Progress</h6></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="activity-legend">
+                        <div class="legend-item">
+                            <div class="legend-color games"></div>
+                            <span>Assignment</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color karate"></div>
+                            <span>Test/Exam</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color badminton"></div>
+                            <span>Task/Tutorial</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2025 StudyPlan Profile Page. All rights reserved. | Built with Love</p>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Animate skill progress bars when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const progressBars = document.querySelectorAll('.skill-progress-bar');
+            
+            // Trigger animation after a short delay
+            setTimeout(() => {
+                progressBars.forEach(bar => {
+                    bar.style.transition = 'width 1.5s ease-in-out';
+                });
+            }, 500);
+
+            // Add hover effects to stat cards
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // Animate numbers counting up
+            animateCounters();
+        });
+
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stat-info h3');
+            
+            counters.forEach(counter => {
+                const target = parseInt(counter.textContent);
+                let current = 0;
+                const increment = target / 50;
+                
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        counter.textContent = target;
+                        clearInterval(timer);
+                    } else {
+                        counter.textContent = Math.floor(current);
+                    }
+                }, 30);
+            });
+        }
+
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('show');
+        }
+
+        // Add click event to mobile menu button (if needed)
+        document.addEventListener('click', function(e) {
+            const sidebar = document.querySelector('.sidebar');
+            if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !e.target.closest('.mobile-menu-btn')) {
+                sidebar.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

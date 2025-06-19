@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyPlan|Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-purple: #8B5CF6;
+            --primary-pink: #EC4899;
+            --sidebar-bg: #ffffff;
+            --main-bg: #f8fafc;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f0f9f0 0%, #fdf2f8 100%);
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: var(--sidebar-bg);
+            box-shadow: var(--card-shadow);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-brand {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .brand-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+            flex: 1;
+        }
+
+        .nav-item {
+            margin: 0.25rem 1rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background-color: #f1f5f9;
+            color: #334155;
+        }
+
+        .nav-link.active {
+            background-color: #ede9fe;
+            color: var(--primary-purple);
+        }
+
+        .nav-link i {
+            width: 20px;
+            margin-right: 12px;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        .top-header {
+            background: white;
+            box-shadow: var(--card-shadow);
+            padding: 1.5rem 2rem;
+        }
+
+        .greeting-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .greeting-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 1rem;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 320px;
+        }
+
+        .search-box input {
+            padding-left: 2.5rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 0.75rem 1rem;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .content-section {
+            padding: 2rem;
+        }
+
+        .task-card {
+            border-radius: 20px;
+            padding: 2rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+            transition: transform 0.2s ease;
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .task-card-purple {
+            background: linear-gradient(135deg, #8B5CF6, #EC4899);
+        }
+
+        .task-card-orange {
+            background: linear-gradient(135deg, #FB923C, #F472B6);
+        }
+
+        .task-card-green {
+            background: linear-gradient(135deg, #34D399, #3B82F6);
+        }
+
+        .task-icon {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-stats {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .task-number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .change-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+
+        .progress-card, .teacher-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            height: 100%;
+        }
+
+        .tab-buttons {
+            background: #f1f5f9;
+            padding: 0.25rem;
+            border-radius: 12px;
+            display: inline-flex;
+        }
+
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-weight: 500;
+            color: #64748b;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: var(--primary-purple);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 200px;
+            margin: 2rem 0;
+        }
+
+        .teacher-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 12px;
+            transition: background-color 0.2s ease;
+            margin-bottom: 0.5rem;
+        }
+
+        .teacher-item:hover {
+            background-color: #f8fafc;
+        }
+
+        .teacher-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 1rem;
+        }
+
+        .rating-stars {
+            color: #fbbf24;
+        }
+
+        .wave-decoration {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+       .footer {
+            background: white;
+            padding: 20px 30px;
+            border-top: 1px solid #e9ecef;
+            text-align: center;
+            color: #6c757d;
+            font-size: 14px;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-toggle {
+                display: block !important;
+            }
+        }
+
+        .mobile-toggle {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="d-flex align-items-center">
+                <div class="brand-logo">SP</div>
+                <span class="fw-bold ms-2 text-dark">StudyPlan</span>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-item">
+                <a href="dashboard.html" class="nav-link active">
+                    <i class="fas fa-chart-bar"></i>
+                    Dashboard
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="class.html" class="nav-link">
+                    <i class="fas fa-users"></i>
+                    My Class
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="task.html" class="nav-link">
+                    <i class="fas fa-tasks"></i>
+                    Task                
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="calendar.html" class="nav-link">
+                    <i class="fas fa-calendar"></i>
+                    Calendar
+                </a>
+            </div>
+             <div class="nav-item">
+                <a href="profile.html" class="nav-link">
+                    <i class="fas fa-user-friends"></i>
+                    Profile
+                </a>
+            </div>
+
+        </nav>
+        
+        <div class="sidebar-nav border-top pt-3">
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-file-alt"></i>
+                    Report
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-question-circle"></i>
+                    Help
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="index.html" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Log out
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="top-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="greeting-section">
+                    <div class="greeting-avatar"><i class="fas fa-chart-bar"></i></div>
+                    <div>
+                        <h4 class="mb-0 fw-semibold">Welcome ! ✮ ⋆ ˚｡𖦹 ⋆｡°✩</h4>
+                        <p class="mb-0 text-muted">Your Daily Study Hub</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex align-items-center gap-3">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" placeholder="What do you want to study?">
+                    </div>
+                    <button class="btn btn-light rounded-circle p-2">
+                        <i class="fas fa-bell text-muted"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <div class="content-section">
+            <!-- My Tasks Section -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-semibold">My tasks</h3>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-light btn-sm rounded-circle">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="btn btn-light btn-sm rounded-circle">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Task Cards -->
+            <div class="row g-4 mb-5">
+                <div class="col-lg-4 col-md-6">
+                    <div class="task-card task-card-purple">
+                        <div>
+                            <h5 class="fw-semibold mb-1">IMS566 - Advanced Web Design Development & Content Management</h5>
+                        </div>
+                        <div class="task-stats">
+                            <span class="task-number">3</span>
+                            <span>tasks</span>
+                        </div>
+                        <div class="d-flex justify-content-between small">
+                            <span>2 task done</span>
+                            <span>1 task left</span>
+                            <span>50% completed</span>
+                        </div>
+                        <svg class="wave-decoration" width="100" height="60" viewBox="0 0 100 60">
+                            <path d="M0 30C20 20, 40 10, 60 20C80 30, 100 40, 120 30V60H0V30Z" fill="white"/>
+                        </svg>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="task-card task-card-orange">
+                        <div>
+                            <h5 class="fw-semibold mb-1">IMS560 - Advanced Database Management System</h5>
+                        </div>
+                        <div class="task-stats">
+                            <span class="task-number">4</span>
+                            <span>tasks</span>
+                        </div>
+                        <div class="d-flex justify-content-between small">
+                            <span>1 task done</span>
+                            <span>3 task left</span>
+                            <span>40% completed</span>
+                        </div>
+                        <svg class="wave-decoration" width="100" height="60" viewBox="0 0 100 60">
+                            <path d="M0 30C20 20, 40 10, 60 20C80 30, 100 40, 120 30V60H0V30Z" fill="white"/>
+                        </svg>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="task-card task-card-green">
+                        <div>
+                            <h5 class="fw-semibold mb-1">IMS565 - Information System Project Management</h5>
+                        </div>
+                        <div class="task-stats">
+                            <span class="task-number">4</span>
+                            <span>tasks</span>
+                        </div>
+                        <div class="d-flex justify-content-between small">
+                            <span>1 task done</span>
+                            <span>3 task left</span>
+                            <span>40% completed</span>
+                        </div>
+                        <svg class="wave-decoration" width="100" height="60" viewBox="0 0 100 60">
+                            <path d="M0 30C20 20, 40 10, 60 20C80 30, 100 40, 120 30V60H0V30Z" fill="white"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress and Teachers Section -->
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="progress-card">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="fw-semibold mb-0">My progress</h5>
+                            <a href="#" class="text-decoration-none" style="color: var(--primary-purple);">View other</a>
+                        </div>
+                        
+                        <div class="tab-buttons mb-4">
+                            <button class="tab-btn active" onclick="switchTab(this, 'day')">Day</button>
+                            <button class="tab-btn" onclick="switchTab(this, 'week')">Week</button>
+                            <button class="tab-btn" onclick="switchTab(this, 'month')">Month</button>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <canvas id="progressChart"></canvas>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between text-muted small">
+                            <span>12 June</span>
+                            <span>17 June</span>
+                            <span>20 June</span>
+                            <span>25 June</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="teacher-card">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="fw-semibold mb-0">Subjects</h5>
+                            <a href="#" class="text-decoration-none" style="color: var(--primary-purple);">View all</a>
+                        </div>
+                        
+                        <div class="teacher-item">
+                            <div class="teacher-avatar">👩‍🏫</div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">IMS566</h6>
+                                <p class="text-muted small mb-0">Advance Web Design</p>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-semibold">4.9</div>
+                                <div class="rating-stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="teacher-item">
+                            <div class="teacher-avatar">👨‍💼</div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">IMR533</h6>
+                                <p class="text-muted small mb-0">Information Ethic & Law</p>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-semibold">4.7</div>
+                                <div class="rating-stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="teacher-item">
+                            <div class="teacher-avatar">👩‍🎓</div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">TAC501</h6>
+                                <p class="text-muted small mb-0">Introductory Arabic (Level III)</p>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-semibold">4.8</div>
+                                <div class="rating-stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2025 StudyPlan Dashboard. All rights reserved. | Built with Love</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script>
+
+        // Tab Switching
+        function switchTab(clickedTab, tabType) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-btn').forEach(tab => tab.classList.remove('active'));
+            
+            // Add active class to clicked tab
+            clickedTab.classList.add('active');
+            
+            // Update chart data based on tab
+            updateChart(tabType);
+        }
+
+        // Chart Configuration
+        let progressChart;
+
+        function initChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            
+            const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+            gradient.addColorStop(0, 'rgba(139, 92, 246, 0.3)');
+            gradient.addColorStop(1, 'rgba(139, 92, 246, 0.1)');
+            
+            progressChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['12 June', '17 June', '20 June', '25 June'],
+                    datasets: [{
+                        data: [3, 5, 4, 7],
+                        borderColor: '#8B5CF6',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#8B5CF6',
+                        pointBorderColor: '#8B5CF6',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: false,
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            display: false,
+                            grid: {
+                                display: false
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        }
+
+        function updateChart(tabType) {
+            const data = {
+                day: [3, 5, 4, 7],
+                week: [15, 22, 18, 28],
+                month: [45, 52, 48, 65]
+            };
+            
+            progressChart.data.datasets[0].data = data[tabType] || data.day;
+            progressChart.update();
+        }
+
+        // Search Functionality
+        document.querySelector('.search-box input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            console.log('Searching for:', searchTerm);
+            // Add your search logic here
+        });
+
+        // Initialize Chart on Page Load
+        document.addEventListener('DOMContentLoaded', function() {
+            initChart();
+            
+            // Add some interactive animations
+            setTimeout(() => {
+                document.querySelectorAll('.task-card').forEach((card, index) => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.5s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, index * 200);
+                });
+            }, 100);
+        });
+
+        
+        // Sidebar functionality
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            lessonDetails.classList.remove('active');
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

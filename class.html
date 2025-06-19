@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyPlan|Class</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-purple: #8B5CF6;
+            --primary-pink: #EC4899;
+            --sidebar-bg: #ffffff;
+            --main-bg: #f8fafc;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f0f9f0 0%, #fdf2f8 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: var(--sidebar-bg);
+            box-shadow: var(--card-shadow);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-brand {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .brand-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+            flex: 1;
+        }
+
+        .nav-item {
+            margin: 0.25rem 1rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background-color: #f1f5f9;
+            color: #334155;
+        }
+
+        .nav-link.active {
+            background-color: #ede9fe;
+            color: var(--primary-purple);
+        }
+
+        .nav-link i {
+            width: 20px;
+            margin-right: 12px;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-header {
+            background: white;
+            box-shadow: var(--card-shadow);
+            padding: 1.5rem 2rem;
+        }
+
+        .greeting-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .greeting-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-pink));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 1rem;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 320px;
+        }
+
+        .search-box input {
+            padding-left: 2.5rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 0.75rem 1rem;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .content-section {
+            padding: 2rem;
+            flex: 1;
+        }
+
+        .lesson-container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .lesson-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        .lesson-card.ims560 {
+            background-color: #aac8e6;
+        }
+
+        .lesson-card.ims564 {
+             background-color: #e48c8c;
+        }
+
+        .lesson-card.ims565 {
+             background-color: #aae6b9;
+        }
+
+        .lesson-card.ims566 {
+             background-color: #0d3b69;
+        }
+
+        .lesson-card.imr533 {
+             background-color: #8d573d;
+        }
+
+        .lesson-card.lcc501 {
+            background-color: #8f0778;
+        }
+
+        .lesson-details {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 50px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            z-index: 1060;
+            max-width: 500px;
+            width: 90%;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .lesson-details.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .lesson-title {
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .info-section {
+            margin-bottom: 0px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 0px;
+        }
+
+        .info-value {
+            color: #666;
+            margin-bottom: 0px;
+        }
+
+        .upcoming-section {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1040;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .footer {
+            background: white;
+            padding: 20px 30px;
+            border-top: 1px solid #e9ecef;
+            text-align: center;
+            color: #6c757d;
+            font-size: 14px;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-toggle {
+                display: block !important;
+            }
+            
+            .lesson-container {
+                max-width: 100%;
+                padding: 0 10px;
+            }
+        }
+
+        .mobile-toggle {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="d-flex align-items-center">
+                <div class="brand-logo">SP</div>
+                <span class="fw-bold ms-2 text-dark">StudyPlan</span>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-chart-bar"></i>
+                    Dashboard
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="class.html" class="nav-link active">
+                    <i class="fas fa-users"></i>
+                    My Class
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="task.html" class="nav-link">
+                    <i class="fas fa-tasks"></i>
+                    Task                
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="calendar.html" class="nav-link">
+                    <i class="fas fa-calendar"></i>
+                    Calendar
+                </a>
+            </div>
+             <div class="nav-item">
+                <a href="profile.html" class="nav-link">
+                    <i class="fas fa-user-friends"></i>
+                    Profile
+                </a>
+            </div>
+        </nav>
+        
+        <div class="sidebar-nav border-top pt-3">
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-file-alt"></i>
+                    Report
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-question-circle"></i>
+                    Help
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="index.html" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Log out
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="top-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="greeting-section">
+                    <div class="greeting-avatar"><i class="fas fa-users"></i></div>
+                    <div>
+                        <h4 class="mb-0 fw-semibold"> ⋆˚࿔ SEMESTER 4 20252 CLASS ⋆˚࿔</h4>
+                        <p class="mb-0 text-muted">Game On: Study Mode (<i class="fa-solid fa-circle-check"></i> click class to view details)</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex align-items-center gap-3">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" placeholder="What do you want to study?">
+                    </div>
+                    <button class="btn btn-light rounded-circle p-2">
+                        <i class="fas fa-bell text-muted"></i>
+                    </button>
+                    <button class="btn btn-light d-md-none mobile-toggle" id="mobileToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Section -->
+        <div class="content-section">
+            <div class="lesson-container">
+                <div class="lesson-card ims560" data-lesson="ims560">
+                    IMS 560
+                </div>
+                
+                <div class="lesson-card ims564" data-lesson="ims564">
+                    IMS 564
+                </div>
+                
+                <div class="lesson-card ims565" data-lesson="ims565">
+                    IMS 565
+                </div>
+                
+                <div class="lesson-card ims566" data-lesson="ims566">
+                    IMS 566
+                </div>
+                
+                <div class="lesson-card imr533" data-lesson="imr533">
+                    IMR 533
+                </div>
+                
+                <div class="lesson-card lcc501" data-lesson="lcc501">
+                    LCC 501
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2025 StudyPlan Class. All rights reserved. | Built with Love</p>
+        </footer>
+    </div>
+
+    <!-- Class Details Modal -->
+    <div class="lesson-details" id="lessonDetails">
+        <button class="close-btn" id="closeBtn">&times;</button>
+        <div class="lesson-content">
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // class data
+        const lessonData = {
+            ims560: {
+                title: "IMS560 - Advanced Database Management System",
+                lecturer: "En Amzari",
+                class: "Computer Lab 5",
+                chapter: "Chapter 10",
+                nextLesson: "Thursday, 14:00 PM",
+                upcomingTest: "Final Test - , 14 July 2025",
+                progress: "75%",
+                assignments: "Database Implementation (Due: 18 July 2025)",
+                topics: ["Advance DB", "CAP Theorem", "New SQL", "Key Value"]
+            },
+             ims564: {
+                title: "IMS564 - User Experience Design",
+                lecturer: "Pn Norizan",
+                class: "Lab Info Tool",
+                chapter: "Chapter 8",
+                nextLesson: "Monday, 15:00 PM",
+                upcomingTest: "Final Exam - , 10 July 2025",
+                progress: "65%",
+                assignments: "Figma (Due: 30 June 2025 )",
+                topics: ["UX", "Scope Plan", "Surface Plane", "Applications"]
+
+            },
+            ims565: {
+                title: "IMS565 - Information Project System Management",
+                lecturer: "Pn Yanty Rahayu",
+                class: "Bilik Kuliah 10",
+                chapter: "Chapter 8",
+                nextLesson: "Monday, 11:00 AM",
+                upcomingTest: "Final Test - , 14 July 2025",
+                progress: "72%",
+                assignments: "Project Management (Due: 8 July 2025)",
+                topics: ["Project Management", "Integration Management", "Project Scope"]
+            },
+            ims566: {
+                title: "IMS566 - Advanced Web Design Development & Content Management",
+                lecturer: "En Muhammad Asyraf",
+                class: "Computer Lab 1",
+                chapter: "Chapter 6",
+                nextLesson: "Tuesday, 14:00 PM",
+                upcomingTest: "-",
+                progress: "81%",
+                assignments: "Web Development (Due: 14 July 2025)",
+                topics: ["Logical Sequences", "HTML", "Bootstrap", "CSS"]
+            },
+            imr533: {
+                title: "IMR533 - Information Ethics & Law",
+                lecturer: "En Abdul Rahman",
+                class: "Bilik Kuliah 22",
+                chapter: "Chapter 10",
+                nextLesson: "Thursday, 08:00 AM",
+                upcomingTest: "Final Test - 3 July 2025",
+                progress: "79%",
+                assignments: "Reflective Essay (Due: 20 July 2025)",
+                topics: ["Ethics", "Law", "IE", "Framework"]
+            },
+            lcc501: {
+                title: "LCC501 - English for Professional Correspondance",
+                lecturer: "Pn Hartini",
+                class: "Computer Lab 1",
+                chapter: "Chapter 7",
+                nextLesson: "Wednesday, 10:00 AM",
+                upcomingTest: "-",
+                progress: "85%",
+                assignments: "Project (Due: 20 July 2025)",
+                topics: ["Email", "Internal", "External", "Correspondance"]
+            }
+        };
+
+        // DOM elements
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const lessonCards = document.querySelectorAll('.lesson-card');
+        const lessonDetails = document.getElementById('lessonDetails');
+        const closeBtn = document.getElementById('closeBtn');
+        const mobileToggle = document.getElementById('mobileToggle');
+
+        // Mobile sidebar toggle
+        if (mobileToggle) {
+            mobileToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('show');
+                overlay.classList.toggle('active');
+            });
+        }
+
+        // Overlay functionality
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('show');
+            overlay.classList.remove('active');
+            lessonDetails.classList.remove('active');
+        });
+
+        // class card functionality
+        lessonCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const lessonType = card.getAttribute('data-lesson');
+                const lesson = lessonData[lessonType];
+                showLessonDetails(lesson);
+            });
+        });
+
+        // Close class details
+        closeBtn.addEventListener('click', () => {
+            lessonDetails.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        // Show class details
+        function showLessonDetails(lesson) {
+            const content = `
+                <div class="lesson-title">${lesson.title}</div>
+                
+                <div class="info-section">
+                    <div class="info-label">Lecturer</div>
+                    <div class="info-value">${lesson.lecturer}</div>
+                </div>
+                
+                <div class="info-section">
+                    <div class="info-label">Class</div>
+                    <div class="info-value">${lesson.class}</div>
+                </div>
+                
+                <div class="info-section">
+                    <div class="info-label">Current Chapter</div>
+                    <div class="info-value">${lesson.chapter}</div>
+                </div>
+                
+                <div class="info-section">
+                    <div class="info-label">Progress</div>
+                    <div class="info-value">
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar" style="width: ${lesson.progress}; background: linear-gradient(90deg, #667eea, #764ba2);"></div>
+                        </div>
+                        <small class="text-muted">${lesson.progress} completed</small>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <div class="info-label">Key Topics</div>
+                    <div class="info-value">
+                        ${lesson.topics.map(topic => `<span class="badge bg-light text-dark me-1 mb-1">${topic}</span>`).join('')}
+                    </div>
+                </div>
+                
+                <div class="upcoming-section">
+                    <h6><i class="fas fa-clock me-2"></i>Upcoming</h6>
+                    <div class="mb-2">
+                        <strong>Next Lesson:</strong><br>
+                        <small>${lesson.nextLesson}</small>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Upcoming Test:</strong><br>
+                        <small>${lesson.upcomingTest}</small>
+                    </div>
+                    <div>
+                        <strong>Pending Assignment:</strong><br>
+                        <small>${lesson.assignments}</small>
+                    </div>
+                </div>
+            `;
+            
+            document.querySelector('.lesson-content').innerHTML = content;
+            lessonDetails.classList.add('active');
+            overlay.classList.add('active');
+        }
+
+        // Search functionality
+        document.querySelector('.search-box input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            console.log('Searching for:', searchTerm);
+            // Add your search logic here
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('active');
+            }
+        });
+
+        // Add some animation delays for class cards
+        lessonCards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+        });
+    </script>
+</body>
+</html>
